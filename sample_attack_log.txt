@@ -1,0 +1,11 @@
+# Sample Access & System Log File for Threat Detection Testing
+192.0.2.14 - - [31/Aug/2026:21:00:01 +0000] "GET /index.html HTTP/1.1" 200 4120 "-" "Mozilla/5.0"
+192.0.2.45 - - [31/Aug/2026:21:00:05 +0000] "GET /login?user=admin' OR '1'='1 HTTP/1.1" 403 210 "-" "Mozilla/5.0"
+192.0.2.45 - - [31/Aug/2026:21:00:10 +0000] "GET /download?file=../../../../etc/passwd HTTP/1.1" 404 150 "-" "Mozilla/5.0"
+192.0.2.99 - - [31/Aug/2026:21:01:00 +0000] "POST /api/exec?cmd=;cat%20/etc/shadow HTTP/1.1" 500 95 "-" "curl/7.68.0"
+192.0.2.100 - - [31/Aug/2026:21:01:15 +0000] "GET /.env HTTP/1.1" 404 120 "-" "nikto/2.1.6"
+Aug 31 21:02:01 server sshd[4012]: Failed password for root from 192.0.2.200 port 41234 ssh2
+Aug 31 21:02:02 server sshd[4013]: Failed password for root from 192.0.2.200 port 41235 ssh2
+Aug 31 21:02:03 server sshd[4014]: Failed password for root from 192.0.2.200 port 41236 ssh2
+Aug 31 21:02:04 server sshd[4015]: Failed password for root from 192.0.2.200 port 41237 ssh2
+Aug 31 21:02:05 server sshd[4016]: Failed password for root from 192.0.2.200 port 41238 ssh2
