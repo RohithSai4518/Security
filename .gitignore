@@ -1,0 +1,14 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Media / Uploaded files
+media/uploads/
+
+# DB
+db.sqlite3
+
+# Distribution / Zip
+*.zip
+*.log

@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "secureshare"
+version = "1.0.0"
+description = "SecureShare - Secure File Storage & Security Operations Suite"
+authors = ["Security Engineering Team <team@secureshare.internal>"]
+readme = "README.md"
+packages = [{include = "secsuite"}, {include = "portal"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^5.1.0"
+asgiref = "^3.8.1"
+sqlparse = "^0.5.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
