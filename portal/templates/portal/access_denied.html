@@ -1,0 +1,28 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Access Forbidden - 403{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="card border-danger p-5">
+            <i class="bi bi-shield-slash-fill text-danger display-1 mb-3"></i>
+            <h2 class="text-danger fw-bold">403 - Access Denied</h2>
+            <h5 class="text-white mt-2">Unauthorized Resource Request</h5>
+            <p class="text-muted small mt-2">
+                You do not possess valid cryptographic ownership or authorization permissions to access:
+                <br><strong class="text-warning font-monospace">{{ file_name }}</strong>
+            </p>
+            <div class="alert alert-dark border-secondary small text-start mt-3">
+                <i class="bi bi-info-circle text-info me-1"></i>
+                <strong>Security Notice:</strong> This unauthorized access attempt has been recorded in the central security audit log with your account identifier and IP address.
+            </div>
+            <div class="mt-4">
+                <a href="{% url 'dashboard' %}" class="btn btn-primary px-4">
+                    <i class="bi bi-arrow-left me-1"></i> Return to Secure Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

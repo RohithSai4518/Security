@@ -1,0 +1,101 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Manage Sharing - {{ file.original_filename }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: Grant Access Form -->
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h4 class="text-white mb-1"><i class="bi bi-person-plus text-info me-2"></i>Share File</h4>
+            <p class="text-muted small mb-4">Grant access for <strong>{{ file.original_filename }}</strong></p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label text-light small fw-semibold">Target User's Username</label>
+                    {{ form.recipient_username }}
+                    {% if form.recipient_username.errors %}
+                        <div class="text-danger small mt-1">{{ form.recipient_username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-light small fw-semibold">Permission Level</label>
+                    {{ form.permission }}
+                    {% if form.permission.errors %}
+                        <div class="text-danger small mt-1">{{ form.permission.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-shield-lock me-1"></i> Grant Access
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Active Authorized Users -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header text-white">
+                <i class="bi bi-people-fill text-warning me-1"></i> Currently Authorized Users ({{ existing_shares.count }})
+            </div>
+            <div class="card-body p-0">
+                {% if existing_shares %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Permission</th>
+                                <th>Granted At</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in existing_shares %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold text-white">
+                                        <i class="bi bi-person-check text-success me-1"></i>{{ s.shared_with.username }}
+                                    </div>
+                                    <span class="small text-muted">{{ s.shared_with.email }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge {% if s.permission == 'DOWNLOAD' %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ s.permission }}
+                                    </span>
+                                </td>
+                                <td><span class="small text-muted">{{ s.created_at|date:"M d, H:i" }}</span></td>
+                                <td class="text-end">
+                                    <a href="{% url 'revoke_share' s.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Revoke access for {{ s.shared_with.username }}?');">
+                                        <i class="bi bi-x-circle me-1"></i> Revoke
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-lock-fill display-5"></i>
+                    <p class="mt-2 mb-0 small">This file is private. Only you can view or download it.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

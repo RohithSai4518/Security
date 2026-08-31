@@ -1,0 +1,121 @@
+:root {
+    --bg-dark: #0b0f19;
+    --card-dark: #111827;
+    --card-border: #1f2937;
+    --accent: #0284c7;
+    --accent-hover: #0369a1;
+    --accent-glow: rgba(2, 132, 199, 0.2);
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --success-border: #059669;
+    --danger-border: #dc2626;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    background-color: #030712 !important;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #38bdf8 !important;
+}
+
+.card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--card-border);
+    font-weight: 600;
+}
+
+.stat-card {
+    border-left: 4px solid var(--accent);
+}
+
+.stat-card.alert-stat {
+    border-left: 4px solid #ef4444;
+}
+
+.stat-title {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.table-dark {
+    background-color: transparent;
+    --bs-table-bg: transparent;
+}
+
+.table-dark th {
+    border-color: var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.table-dark td {
+    border-color: var(--card-border);
+    vertical-align: middle;
+}
+
+.btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.form-control, .form-select {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    color: #f3f4f6;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #1f2937;
+    border-color: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 0 0 0.25rem var(--accent-glow);
+}
+
+.badge-security {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+    font-weight: 600;
+}
+
+footer {
+    margin-top: auto;
+    border-top: 1px solid var(--card-border);
+    padding: 1.5rem 0;
+    background-color: #030712;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
