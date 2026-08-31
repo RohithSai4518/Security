@@ -1,0 +1,164 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Security Admin Operations Portal{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="text-white mb-1"><i class="bi bi-shield-shaded text-warning me-2"></i>Security Administrator Console</h2>
+        <p class="text-muted small mb-0">Live threat monitoring, authorization policy audits, and user storage overview</p>
+    </div>
+</div>
+
+<!-- Admin Stat Overview -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 stat-card">
+            <div class="stat-title">Registered Accounts</div>
+            <div class="stat-value">{{ users_count }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 stat-card">
+            <div class="stat-title">Stored Files Total</div>
+            <div class="stat-value">{{ files_count }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 stat-card">
+            <div class="stat-title">System Disk Storage</div>
+            <div class="stat-value">{{ total_storage_formatted }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 stat-card alert-stat">
+            <div class="stat-title text-danger fw-semibold">Access Violations</div>
+            <div class="stat-value text-danger">{{ alerts_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Global Files & User List -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header text-white d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-folder-fill text-info me-2"></i>All Stored Files in System</span>
+                <span class="badge bg-secondary">{{ all_files.count }} files</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table table-dark table-sm table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Owner</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in all_files %}
+                            <tr>
+                                <td>
+                                    <div class="text-white text-truncate" style="max-width: 180px;">
+                                        {{ f.original_filename }}
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-dark border border-secondary">{{ f.owner.username }}</span></td>
+                                <td><span class="small text-muted">{{ f.formatted_size }}</span></td>
+                                <td><span class="small text-muted">{{ f.uploaded_at|date:"M d, H:i" }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-3">No files stored.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header text-white">
+                <i class="bi bi-people-fill text-info me-2"></i>Registered User Accounts
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                    <table class="table table-dark table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td class="fw-semibold text-white">{{ u.username }}</td>
+                                <td class="small text-muted">{{ u.email|default:"N/A" }}</td>
+                                <td>
+                                    {% if u.is_superuser %}
+                                        <span class="badge bg-danger">SUPERUSER</span>
+                                    {% elif u.is_staff %}
+                                        <span class="badge bg-warning text-dark">STAFF</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">USER</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">{{ u.date_joined|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Real-time Security Activity Audit Log -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header text-white d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-shield-exclamation text-danger me-2"></i>Security Audit Trail (Real-Time)</span>
+                <span class="badge bg-dark border border-secondary">{{ audit_logs.count }} events</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
+                    <table class="table table-dark table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>IP</th>
+                                <th>Event Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in audit_logs %}
+                            <tr class="{% if log.action == 'ACCESS_DENIED' %}table-danger text-danger{% endif %}">
+                                <td class="small text-muted">{{ log.timestamp|date:"H:i:s" }}</td>
+                                <td>
+                                    <span class="badge {% if log.action == 'ACCESS_DENIED' %}bg-danger{% elif log.action == 'DELETE' %}bg-warning text-dark{% elif log.action == 'LOGIN' %}bg-success{% else %}bg-info text-dark{% endif %}">
+                                        {{ log.action }}
+                                    </span>
+                                </td>
+                                <td class="small fw-semibold">
+                                    {{ log.user.username|default:"Anonymous" }}
+                                </td>
+                                <td class="small font-monospace">{{ log.ip_address }}</td>
+                                <td class="small">{{ log.details }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-4">No audit logs recorded yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="text-white mb-1">File Vault & Access Manager</h2>
+        <p class="text-muted small mb-0">Securely store, organize, and grant granular permissions to files</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'upload_file' %}" class="btn btn-primary">
+            <i class="bi bi-cloud-plus me-1"></i> Upload New File
+        </a>
+    </div>
+</div>
+
+<!-- Storage & Stat Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 stat-card">
+            <div class="stat-title">My Stored Files</div>
+            <div class="stat-value">{{ total_files_count }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 stat-card">
+            <div class="stat-title">Shared With Me</div>
+            <div class="stat-value">{{ total_shared_count }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 stat-card">
+            <div class="stat-title">Total Space Used</div>
+            <div class="stat-value">{{ total_storage_formatted }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Tabs -->
+<ul class="nav nav-pills mb-3" id="vaultTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active px-4" id="myfiles-tab" data-bs-toggle="pill" data-bs-target="#myfiles" type="button" role="tab">
+            <i class="bi bi-folder-check me-1"></i> My Uploads ({{ my_files.count }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link px-4" id="shared-tab" data-bs-toggle="pill" data-bs-target="#shared" type="button" role="tab">
+            <i class="bi bi-share-fill me-1"></i> Shared With Me ({{ shared_with_me.count }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link px-4" id="audit-tab" data-bs-toggle="pill" data-bs-target="#audit" type="button" role="tab">
+            <i class="bi bi-shield-check me-1"></i> My Security Log
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="vaultTabsContent">
+    <!-- Tab 1: My Files -->
+    <div class="tab-pane fade show active" id="myfiles" role="tabpanel">
+        <div class="card">
+            <div class="card-body p-0">
+                {% if my_files %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Size</th>
+                                <th>Type</th>
+                                <th>Uploaded At</th>
+                                <th>Active Shares</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in my_files %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold text-white">
+                                        <i class="bi bi-file-earmark-text text-info me-1"></i>{{ f.original_filename }}
+                                    </div>
+                                    {% if f.description %}<div class="small text-muted">{{ f.description }}</div>{% endif %}
+                                </td>
+                                <td><span class="badge bg-dark border border-secondary">{{ f.formatted_size }}</span></td>
+                                <td><span class="small text-muted">{{ f.mime_type }}</span></td>
+                                <td><span class="small text-muted">{{ f.uploaded_at|date:"M d, Y H:i" }}</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ f.shares.count }} user(s)</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'download_file' f.id %}" class="btn btn-outline-info" title="Download File">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        <a href="{% url 'share_file' f.id %}" class="btn btn-outline-warning" title="Manage Sharing">
+                                            <i class="bi bi-share"></i>
+                                        </a>
+                                        <a href="{% url 'delete_file' f.id %}" class="btn btn-outline-danger" title="Delete File">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-folder2-open text-muted display-4"></i>
+                    <h5 class="text-muted mt-3">No files uploaded yet</h5>
+                    <p class="text-muted small">Upload your first document, spreadsheet, or archive to begin.</p>
+                    <a href="{% url 'upload_file' %}" class="btn btn-outline-primary btn-sm mt-2">Upload Now</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Shared With Me -->
+    <div class="tab-pane fade" id="shared" role="tabpanel">
+        <div class="card">
+            <div class="card-body p-0">
+                {% if shared_with_me %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Shared By</th>
+                                <th>Size</th>
+                                <th>Permission</th>
+                                <th>Shared Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in shared_with_me %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold text-white">
+                                        <i class="bi bi-file-earmark-lock text-warning me-1"></i>{{ s.file.original_filename }}
+                                    </div>
+                                    {% if s.file.description %}<div class="small text-muted">{{ s.file.description }}</div>{% endif %}
+                                </td>
+                                <td><span class="badge bg-dark border border-secondary">{{ s.shared_by.username }}</span></td>
+                                <td><span class="badge bg-dark border border-secondary">{{ s.file.formatted_size }}</span></td>
+                                <td>
+                                    {% if s.permission == 'DOWNLOAD' %}
+                                        <span class="badge bg-success">Can Download</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">View Metadata Only</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="small text-muted">{{ s.created_at|date:"M d, Y H:i" }}</span></td>
+                                <td class="text-end">
+                                    {% if s.permission == 'DOWNLOAD' %}
+                                    <a href="{% url 'download_file' s.file.id %}" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-download me-1"></i> Download
+                                    </a>
+                                    {% else %}
+                                    <button class="btn btn-outline-secondary btn-sm" disabled>Read Only</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-people text-muted display-4"></i>
+                    <h5 class="text-muted mt-3">No shared files</h5>
+                    <p class="text-muted small">When other users share files with your username, they will show up here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Security Logs -->
+    <div class="tab-pane fade" id="audit" role="tabpanel">
+        <div class="card">
+            <div class="card-header text-white">
+                <i class="bi bi-clock-history me-1 text-info"></i> Recent Account Security Activity
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Action</th>
+                                <th>Source IP</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td class="small text-muted">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                <td>
+                                    <span class="badge {% if log.action == 'ACCESS_DENIED' %}bg-danger{% elif log.action == 'DELETE' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
+                                        {{ log.action }}
+                                    </span>
+                                </td>
+                                <td class="small font-monospace">{{ log.ip_address }}</td>
+                                <td class="small">{{ log.details }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No recent activity recorded.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
